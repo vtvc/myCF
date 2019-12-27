@@ -1,0 +1,98 @@
+{
+
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "i am going creating  my vpc",
+
+
+"Parameters":{
+
+    
+    "PublicAZ": {
+        "Description": "PublicAZ",
+        "Type": "AWS::EC2::AvailabilityZone::Name"
+    },
+
+    
+    "PrivateAZ": {
+        "Description": "-",
+        "Type": "AWS::EC2::AvailabilityZone::Name"
+    }
+    
+    
+    
+    
+    
+
+
+},
+
+"Resources":{
+  
+  "myvpc": {
+    "Type": "AWS::EC2::VPC",
+    "Properties": {
+      "CidrBlock": "192.168.0.0/16"
+    }
+  },
+
+
+  
+  "myIGW": {
+    "Type": "AWS::EC2::InternetGateway"
+  },
+  "AttachGateway": {
+    "Type": "AWS::EC2::VPCGatewayAttachment",
+    "Properties": {
+      "VpcId": 
+      { "Ref": "myvpc" }
+      ,
+      "InternetGatewayId": { "Ref": "myIGW" }
+    }
+  },
+
+
+  
+  "Publicsubnet": {
+    "Type": "AWS::EC2::Subnet",
+    "Properties": {
+      "AvailabilityZone": 
+      { "Ref": "PublicAZ" }
+      ,
+      "VpcId": 
+      { "Ref": "myvpc" }
+      ,
+      "CidrBlock": "192.168.1.0/24"
+    }
+  },
+  
+
+
+  
+  "Privatesubnet": {
+    "Type": "AWS::EC2::Subnet",
+    "Properties": {
+      "AvailabilityZone": 
+      { "Ref": "PrivateAZ" }
+      ,
+      "VpcId": 
+      { "Ref": "myvpc" }
+      ,
+      "CidrBlock": "192.168.2.0/24"
+    }
+  }
+  
+
+
+  
+  
+
+},
+
+"Outputs":{
+
+
+}
+
+
+
+}
