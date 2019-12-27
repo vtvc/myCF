@@ -1,0 +1,232 @@
+{
+
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "i am going creating  my vpc  two",
+
+    "Parameters":{
+
+        
+        "PublicAZ": {
+            "Description": "PublicAZ",
+            "Type": "AWS::EC2::AvailabilityZone::Name"
+        },
+
+        
+        "PrivateAZ": {
+            "Description": "PrivateAZ",
+            "Type": "AWS::EC2::AvailabilityZone::Name"
+        }
+        
+               
+        
+
+
+    },
+
+    "Resources":{
+    
+    "myvpc2": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.10.0.0/16"
+      }
+    },
+
+    
+    "myIGW": {
+      "Type": "AWS::EC2::InternetGateway"
+    },
+    "AttachGateway": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": 
+        { "Ref": "myvpc2" }
+        ,
+        "InternetGatewayId": { "Ref": "myIGW" }
+      }
+    },
+
+    
+    "Publicsubnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": 
+        { "Ref": "PublicAZ" }
+        ,
+        "VpcId": 
+        { "Ref": "myvpc2" }
+        ,
+        "CidrBlock": "10.10.1.0/24"
+      }
+    },
+
+    
+    "publicRT": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": 
+        { "Ref": "myvpc2" }
+       }
+    },
+
+    
+    "PublicrouteTableAssoc": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": 
+        { "Ref": "Publicsubnet" }
+        ,
+        "RouteTableId": 
+        { "Ref": "publicRT" }
+        
+      }
+    },
+
+    
+    "Publicroute": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": 
+        { "Ref": "publicRT" }
+        ,
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": 
+        { "Ref": "myIGW" }
+        
+      }
+    },
+
+
+    
+    "Privatesubnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": 
+        { "Ref": "PrivateAZ" }
+        ,
+        "VpcId": 
+        { "Ref": "myvpc2" }
+        ,
+        "CidrBlock": "10.10.2.0/24"
+      }
+    },
+    
+
+    
+    "PrivateRT": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": 
+        { "Ref": "myvpc2" }
+       
+      }
+    },
+
+    
+    "PriavterouteTableAssoc": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": 
+        { "Ref": "Privatesubnet" }
+        ,
+        "RouteTableId": 
+        { "Ref": "PrivateRT" }
+        
+      }
+    },
+
+    
+   
+    "myEIP" : {
+        
+        "Type" : "AWS::EC2::EIP"
+
+    },
+
+    "myNAT" : {
+        "Type" : "AWS::EC2::NatGateway",
+        "Properties" : {
+           "AllocationId" : { "Fn::GetAtt" : ["myEIP", "AllocationId"]},
+           "SubnetId" : { "Ref" : "Publicsubnet"}
+          }
+     },  
+
+
+    "Privateroute": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": 
+        { "Ref": "PrivateRT" }
+        ,
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId" : { "Ref" : "myNAT" }
+      }
+    }
+    
+       
+    
+
+
+    },
+
+    "Outputs":{
+
+        
+        "myvpcID" : {
+          "Value" : 
+          { "Ref": "myvpc2" }
+          
+        },
+        
+       
+        "myIGWID" : {
+          "Value" : 
+          { "Ref": "myIGW" }
+          
+        },
+        
+        
+        "PublicSNid" : {
+          "Value" :  
+          { "Ref": "Publicsubnet" }
+          
+        },
+
+        
+        "PublicRTid" : {
+          "Value" : 
+          { "Ref": "publicRT" }
+          
+        },
+        
+        
+        "privateSBid" : {
+          "Value" : 
+          { "Ref": "Privatesubnet" }
+          
+        },
+        
+        
+        "PrivateRTid" : {
+          "Value" : 
+          { "Ref": "PrivateRT" }
+          
+        },
+        
+
+        
+        "myeipid" : {
+          "Value" : 
+          { "Ref": "myEIP" }
+          
+        }
+
+        
+
+        
+
+
+    }
+
+
+}
